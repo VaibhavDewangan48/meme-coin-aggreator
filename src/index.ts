@@ -5,18 +5,14 @@ import { initSocketServer } from './websocket/socketServer';
 
 const app = express();
 const server = http.createServer(app);
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
 
-// Home route
-app.get('/', (req, res) => {
-  res.send('Meme Coin Aggregator API + WebSocket is running! Try /api/tokens?q=doge');
-});
+app.get('/', (_req, res) =>
+  res.send('🚀 Meme Coin Aggregator API + WebSocket is running! Try /api/tokens?q=doge')
+);
 
 app.use('/api/tokens', tokenRoutes);
 
-// Initialize WebSocket
 initSocketServer(server);
 
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+server.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
