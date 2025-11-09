@@ -11,10 +11,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/axios": "^0.9.36",
     "@types/express": "^5.0.5",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "axios": "^1.13.2",
+    "express": "^5.1.0",
+    "ioredis": "^5.8.2"
   }
 }

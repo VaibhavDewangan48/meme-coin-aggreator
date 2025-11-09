@@ -1,10 +1,24 @@
 import axios from 'axios';
+import redis from '../cache/redisClient';
+
+const CACHE_TTL = 30; // cache time in seconds
 
 export const fetchFromDexScreener = async (query: string) => {
-  const url = `https://api.dexscreener.com/latest/dex/search?q=${query}`;
+  const cacheKey = `dexscreener:${query}`;
 
   try {
-    const response = await axios.get(url);
+    // 1️⃣ Check if data exists in Redis
+    const cachedData = await redis.get(cacheKey);
+    if (cachedData) {
+      console.log(`Cache hit for "${query}"`);
+      return JSON.parse(cachedData);
+    }
+
+    // 2️⃣ If not in cache, fetch from API
+    console.log(`Fetching live data for "${query}"`);
+    const response = await axios.get(
+      `https://api.dexscreener.com/latest/dex/search?q=${query}`
+    );
     const data = response.data as any;
     const pairs = data.pairs || [];
 
@@ -19,6 +33,9 @@ export const fetchFromDexScreener = async (query: string) => {
         (pair?.txns?.h24?.buys || 0) + (pair?.txns?.h24?.sells || 0),
       protocol: pair?.dexId || 'N/A',
     }));
+
+    // 3️⃣ Store in Redis for 30 seconds
+    await redis.set(cacheKey, JSON.stringify(tokens), 'EX', CACHE_TTL);
 
     return tokens;
   } catch (error: any) {
