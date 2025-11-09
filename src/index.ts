@@ -1,3 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config();
+console.log("Redis URL:", process.env.UPSTASH_REDIS_REST_URL);
+console.log("Redis Token:", process.env.UPSTASH_REDIS_REST_TOKEN ? "✅ Loaded" : "❌ Missing");
+
+
 import express from 'express';
 import http from 'http';
 import tokenRoutes from './routes/tokens';

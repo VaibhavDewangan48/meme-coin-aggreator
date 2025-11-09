@@ -1,6 +1,9 @@
 import express, { Request, Response } from 'express';
 import { fetchFromDexScreener } from '../services/dexScreener';
-import { getCachedData, setCachedData } from '../cache/redisClient';
+const { getCachedData, setCachedData } = require('../cache/redisClient');
+
+
+// import { getCachedData, setCachedData } from '../cache/redisClient';
 
 const router = express.Router();
 

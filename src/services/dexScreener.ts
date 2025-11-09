@@ -1,5 +1,5 @@
 import axios from 'axios';
-import redis from '../cache/redisClient';
+const { getCachedData, setCachedData } = require('../cache/redisClient');
 
 const CACHE_TTL = 30; // cache time in seconds
 
@@ -8,14 +8,14 @@ export const fetchFromDexScreener = async (query: string) => {
 
   try {
     // 1️⃣ Check if data exists in Redis
-    const cachedData = await redis.get(cacheKey);
+    const cachedData = await getCachedData(cacheKey);
     if (cachedData) {
       console.log(`Cache hit for "${query}"`);
       return JSON.parse(cachedData);
     }
 
     // 2️⃣ If not in cache, fetch from API
-    console.log(`Fetching live data for "${query}"`);
+    console.log(`🌐 Fetching live data for "${query}"`);
     const response = await axios.get(
       `https://api.dexscreener.com/latest/dex/search?q=${query}`
     );
@@ -35,11 +35,11 @@ export const fetchFromDexScreener = async (query: string) => {
     }));
 
     // 3️⃣ Store in Redis for 30 seconds
-    await redis.set(cacheKey, JSON.stringify(tokens), 'EX', CACHE_TTL);
+    await setCachedData(cacheKey, JSON.stringify(tokens), CACHE_TTL);
 
     return tokens;
   } catch (error: any) {
-    console.error('Error fetching from DexScreener:', error.message);
+    console.error('❌ Error fetching from DexScreener:', error.message);
     return [];
   }
 };
